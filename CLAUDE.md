@@ -43,3 +43,9 @@ See the [/test](.claude/commands/test.md) skill for invocation, reporting, and a
 - No pickle / opaque deserialization for shipped or loaded artifacts — prefer generated `.py` modules (security: `__reduce__` is an arbitrary-code-execution surface unacceptable in a healthcare-data library)
 - Every production release tag (`vN.N.N`) needs a matching `gh release create --latest` after the PyPI upload step
 - Keep unreachable safety-net `return` statements in walker `while True` loops — they document intent and protect against future control-flow changes
+- Prefer small, single-concern PRs. Refactors with broad test impact (>20 sites) get split: introduce the new shape with the old shape kept as a compat wrapper first, then migrate callers / tests / delete the wrapper in follow-up PRs
+- Before introducing a `Protocol`, abstract base, or new wrapper type, check whether existing inheritance / concrete types already provide the contract — usually they do, and a parallel abstraction just shadows the existing structure
+- When migrating tests off a last-error-wins stub (e.g. `errh_null`) reveals extra errors the stub had been hiding, tighten the input fixture to exercise only the scenario named in the test rather than rebadging the assertion to match the full error list
+- Use "error" terminology consistently (`err_handler`, `seg_error`, `ErrorItem`); reuse the `ErrorItem` / `EleError` / `SegError` hierarchy for new validator return types instead of inventing "Finding" / "Issue" / etc. names
+- IK4/AK4 error codes follow the X12 spec: `"1"` = required data element missing, `"2"` = conditional required missing, etc. When historical pyx12 emission disagrees with the spec (e.g. missing required composite was emitting `"2"` but the spec says `"1"`), fix the validator
+- Preserve Sphinx `:param` / `:type` / `:return` / `:rtype` blocks when refactoring methods that have them; drop only the entries for dropped parameters
