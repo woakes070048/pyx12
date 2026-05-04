@@ -112,6 +112,7 @@ class err_handler:
         self.cur_seg_node = None
         self.seg_node_added = False
         self.cur_ele_node = None
+        self.ele_node_added = False
         self.cur_line = 0
 
     def accept(self, visitor: Any) -> None:
