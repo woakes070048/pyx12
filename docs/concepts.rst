@@ -48,6 +48,11 @@ pyx12 encodes those Implementation Guide rules as XML "map" files under
 validation, error reporting, and the context reader's parent / child
 traversal.
 
+When the bundled maps don't fit your need — validating against a newer
+guide, or a non-HIPAA transaction — copy ``pyx12/map/`` to a local
+directory, edit or add map files there, and point pyx12 at it via the
+``map_path`` parameter (see :ref:`concepts:parameters` below).
+
 pyx12 is focused on X12N Healthcare HIPAA transactions, but the map-based
 design is flexible enough to support any X12 transaction with a known
 structure. To add a new transaction type, drop a new XML map file into
