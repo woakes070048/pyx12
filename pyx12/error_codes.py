@@ -45,6 +45,10 @@ class ErrorCodeSpec:
     and 5010 (IK) output respectively. None means the code is not
     surfaced in that channel (e.g. parser HL1/HL2/LX bypass the ack
     today; preserve that behavior with both = None).
+
+    x12_description is the official X12 spec definition for the error code
+    (e.g., "Required Data Element Missing" for IK4-03 code "1"). Provides
+    cross-reference to the X12 Implementation Guide.
     """
 
     code: str
@@ -52,12 +56,16 @@ class ErrorCodeSpec:
     description: str
     ak_code: str | None
     ik_code: str | None
+    x12_description: str
 
 
 # Element-level pyx12 codes. Module-level constants pair with each
 # ERROR_CODES entry for IDE auto-complete and CLI grep-ability.
-# Sorted: numeric X12 codes (1, 4, 5, 6, 7, 8, 9, 10), then non-numeric.
+# Sorted: numeric X12 codes (1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 13),
+# then implementation-dependent codes (I6, I9, I10, I11, I12, I13).
 ELE_1_MANDATORY_MISSING = "ELE_1_mandatory_missing"
+ELE_2_CONDITIONAL_MISSING = "ELE_2_conditional_missing"
+ELE_3_TOO_MANY_ELEMENTS = "ELE_3_too_many_elements"
 ELE_4_TOO_SHORT = "ELE_4_too_short"
 ELE_5_TOO_LONG = "ELE_5_too_long"
 ELE_6_INVALID_COMPOSITE = "ELE_6_invalid_composite"
@@ -70,7 +78,10 @@ ELE_8_INVALID_DATE = "ELE_8_invalid_date"
 ELE_8_INVALID_DATE_RANGE = "ELE_8_invalid_date_range"
 ELE_9_INVALID_TIME = "ELE_9_invalid_time"
 ELE_9_INVALID_TIME_OF_DAY = "ELE_9_invalid_time_of_day"
-ELE_10_NOT_USED = "ELE_10_not_used"
+ELE_10_SYNTAX_EXCLUSIVE = "ELE_10_syntax_exclusive"
+ELE_12_TOO_MANY_REPETITIONS = "ELE_12_too_many_repetitions"
+ELE_13_TOO_MANY_COMPONENTS = "ELE_13_too_many_components"
+ELE_I10_NOT_USED = "ELE_I10_not_used"
 
 # Composite-level pyx12 codes. Composites historically emitted via
 # EleError carrying the seg_error code semantics (see _composite.py).
@@ -105,13 +116,30 @@ SEG_10_SYNTAX_EXCLUSIVE = "SEG_10_syntax_exclusive"
 
 
 ERROR_CODES: dict[str, ErrorCodeSpec] = {
-    # --- Element-level: sorted by numeric X12 code (1, 4, 5, 6, 7, 8, 9, 10) ---
+    # --- Element-level: sorted by numeric X12 code (1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 13) ---
     ELE_1_MANDATORY_MISSING: ErrorCodeSpec(
         code=ELE_1_MANDATORY_MISSING,
         level="ELE",
         description="Mandatory data element missing",
         ak_code="1",
         ik_code="1",
+        x12_description="Required Data Element Missing",
+    ),
+    ELE_2_CONDITIONAL_MISSING: ErrorCodeSpec(
+        code=ELE_2_CONDITIONAL_MISSING,
+        level="ELE",
+        description="Conditional required data element missing",
+        ak_code="2",
+        ik_code="2",
+        x12_description="Conditional Required Data Element Missing",
+    ),
+    ELE_3_TOO_MANY_ELEMENTS: ErrorCodeSpec(
+        code=ELE_3_TOO_MANY_ELEMENTS,
+        level="ELE",
+        description="Too many data elements",
+        ak_code="3",
+        ik_code="3",
+        x12_description="Too Many Data Elements",
     ),
     ELE_4_TOO_SHORT: ErrorCodeSpec(
         code=ELE_4_TOO_SHORT,
@@ -119,6 +147,7 @@ ERROR_CODES: dict[str, ErrorCodeSpec] = {
         description="Data element too short",
         ak_code="4",
         ik_code="4",
+        x12_description="Data Element Too Short",
     ),
     ELE_5_TOO_LONG: ErrorCodeSpec(
         code=ELE_5_TOO_LONG,
@@ -126,6 +155,7 @@ ERROR_CODES: dict[str, ErrorCodeSpec] = {
         description="Data element too long",
         ak_code="5",
         ik_code="5",
+        x12_description="Data Element Too Long",
     ),
     ELE_6_INVALID_COMPOSITE: ErrorCodeSpec(
         code=ELE_6_INVALID_COMPOSITE,
@@ -133,6 +163,7 @@ ERROR_CODES: dict[str, ErrorCodeSpec] = {
         description="Composite element used at non-composite position",
         ak_code="6",
         ik_code="6",
+        x12_description="Invalid Character In Data Element",
     ),
     ELE_6_TRAILING_SPACE: ErrorCodeSpec(
         code=ELE_6_TRAILING_SPACE,
@@ -140,6 +171,7 @@ ERROR_CODES: dict[str, ErrorCodeSpec] = {
         description="Trailing space in data element",
         ak_code="6",
         ik_code="6",
+        x12_description="Invalid Character In Data Element",
     ),
     ELE_6_CONTROL_CHAR: ErrorCodeSpec(
         code=ELE_6_CONTROL_CHAR,
@@ -147,6 +179,7 @@ ERROR_CODES: dict[str, ErrorCodeSpec] = {
         description="Control character in data element",
         ak_code="6",
         ik_code="6",
+        x12_description="Invalid Character In Data Element",
     ),
     ELE_6_INVALID_TYPE_CHAR: ErrorCodeSpec(
         code=ELE_6_INVALID_TYPE_CHAR,
@@ -154,6 +187,7 @@ ERROR_CODES: dict[str, ErrorCodeSpec] = {
         description="Invalid character for declared element data type",
         ak_code="6",
         ik_code="6",
+        x12_description="Invalid Character In Data Element",
     ),
     ELE_7_INVALID_CODE: ErrorCodeSpec(
         code=ELE_7_INVALID_CODE,
@@ -161,6 +195,7 @@ ERROR_CODES: dict[str, ErrorCodeSpec] = {
         description="Data element value not in valid code list",
         ak_code="7",
         ik_code="7",
+        x12_description="Invalid Code Value",
     ),
     ELE_7_REGEX_FAIL: ErrorCodeSpec(
         code=ELE_7_REGEX_FAIL,
@@ -168,6 +203,7 @@ ERROR_CODES: dict[str, ErrorCodeSpec] = {
         description="Data element does not match required regex pattern",
         ak_code="7",
         ik_code="7",
+        x12_description="Invalid Code Value",
     ),
     ELE_8_INVALID_DATE: ErrorCodeSpec(
         code=ELE_8_INVALID_DATE,
@@ -175,6 +211,7 @@ ERROR_CODES: dict[str, ErrorCodeSpec] = {
         description="Data element contains an invalid date (D8/D6/DT)",
         ak_code="8",
         ik_code="8",
+        x12_description="Invalid Date",
     ),
     ELE_8_INVALID_DATE_RANGE: ErrorCodeSpec(
         code=ELE_8_INVALID_DATE_RANGE,
@@ -182,6 +219,7 @@ ERROR_CODES: dict[str, ErrorCodeSpec] = {
         description="Data element contains an invalid date range (RD8)",
         ak_code="8",
         ik_code="8",
+        x12_description="Invalid Date",
     ),
     ELE_9_INVALID_TIME: ErrorCodeSpec(
         code=ELE_9_INVALID_TIME,
@@ -189,6 +227,7 @@ ERROR_CODES: dict[str, ErrorCodeSpec] = {
         description="Data element contains an invalid time (TM)",
         ak_code="9",
         ik_code="9",
+        x12_description="Invalid Time",
     ),
     ELE_9_INVALID_TIME_OF_DAY: ErrorCodeSpec(
         code=ELE_9_INVALID_TIME_OF_DAY,
@@ -196,13 +235,39 @@ ERROR_CODES: dict[str, ErrorCodeSpec] = {
         description="Data element contains an invalid time-of-day value",
         ak_code="9",
         ik_code="9",
+        x12_description="Invalid Time",
     ),
-    ELE_10_NOT_USED: ErrorCodeSpec(
-        code=ELE_10_NOT_USED,
+    ELE_10_SYNTAX_EXCLUSIVE: ErrorCodeSpec(
+        code=ELE_10_SYNTAX_EXCLUSIVE,
         level="ELE",
-        description="Data element marked Not Used (usage='N')",
+        description="Exclusion Condition Violated",
         ak_code="10",
         ik_code="10",
+        x12_description="Exclusion Condition Violated",
+    ),
+    ELE_12_TOO_MANY_REPETITIONS: ErrorCodeSpec(
+        code=ELE_12_TOO_MANY_REPETITIONS,
+        level="ELE",
+        description="Too many repetitions of data element",
+        ak_code="12",
+        ik_code="12",
+        x12_description="Too Many Repetitions",
+    ),
+    ELE_13_TOO_MANY_COMPONENTS: ErrorCodeSpec(
+        code=ELE_13_TOO_MANY_COMPONENTS,
+        level="ELE",
+        description="Too many components in data element",
+        ak_code="13",
+        ik_code="13",
+        x12_description="Too Many Components",
+    ),
+    ELE_I10_NOT_USED: ErrorCodeSpec(
+        code=ELE_I10_NOT_USED,
+        level="ELE",
+        description="Implementation: data element marked Not Used (usage='N')",
+        ak_code=None,
+        ik_code="I10",
+        x12_description="Implementation 'Not Used' Data Element Present",
     ),
     # --- Composite-level: sorted by numeric X12 code (1, 3, 5) ---
     COMP_1_MANDATORY_MISSING: ErrorCodeSpec(
@@ -211,6 +276,7 @@ ERROR_CODES: dict[str, ErrorCodeSpec] = {
         description="Mandatory composite element missing",
         ak_code="1",
         ik_code="1",
+        x12_description="Required Data Element Missing",
     ),
     COMP_3_TOO_MANY_SUBELEMENTS: ErrorCodeSpec(
         code=COMP_3_TOO_MANY_SUBELEMENTS,
@@ -218,13 +284,15 @@ ERROR_CODES: dict[str, ErrorCodeSpec] = {
         description="Composite has too many sub-elements",
         ak_code="3",
         ik_code="3",
+        x12_description="Too Many Data Elements",
     ),
     COMP_5_NOT_USED: ErrorCodeSpec(
         code=COMP_5_NOT_USED,
         level="ELE",
         description="Composite marked Not Used (usage='N')",
         ak_code="5",
-        ik_code="5",
+        ik_code="I10",
+        x12_description="Implementation 'Not Used' Data Element Present (5010)",
     ),
     # --- Segment-level: sorted by numeric X12 code (1, 2, 3, 4, 5, 8, 10),
     # then non-numeric for code 8 (multiple sub-codes) ---
@@ -234,6 +302,7 @@ ERROR_CODES: dict[str, ErrorCodeSpec] = {
         description="Unrecognized segment ID",
         ak_code="1",
         ik_code="1",
+        x12_description="Unrecognized segment ID",
     ),
     SEG_1_INVALID_SEG_ID: ErrorCodeSpec(
         code=SEG_1_INVALID_SEG_ID,
@@ -241,6 +310,7 @@ ERROR_CODES: dict[str, ErrorCodeSpec] = {
         description="Segment identifier is malformed (parser-time invalid seg ID)",
         ak_code="1",
         ik_code="1",
+        x12_description="Unrecognized segment ID",
     ),
     SEG_1_LEADING_SPACE: ErrorCodeSpec(
         code=SEG_1_LEADING_SPACE,
@@ -248,6 +318,7 @@ ERROR_CODES: dict[str, ErrorCodeSpec] = {
         description="Segment line started with leading whitespace (parser-time)",
         ak_code="1",
         ik_code="1",
+        x12_description="Unrecognized segment ID",
     ),
     SEG_2_SYNTAX_RELATIONAL: ErrorCodeSpec(
         code=SEG_2_SYNTAX_RELATIONAL,
@@ -255,20 +326,23 @@ ERROR_CODES: dict[str, ErrorCodeSpec] = {
         description="Segment syntax rule (relational) violated",
         ak_code="2",
         ik_code="2",
+        x12_description="Unexpected segment",
     ),
     SEG_2_SEGMENT_NOT_USED: ErrorCodeSpec(
         code=SEG_2_SEGMENT_NOT_USED,
         level="SEG",
         description="Segment marked Not Used (usage='N')",
         ak_code="2",
-        ik_code="2",
+        ik_code="I4",
+        x12_description="Implementation 'Not Used' Segment Present",
     ),
     SEG_2_LOOP_NOT_USED: ErrorCodeSpec(
         code=SEG_2_LOOP_NOT_USED,
         level="SEG",
         description="Loop marked Not Used (usage='N')",
         ak_code="2",
-        ik_code="2",
+        ik_code="I4",
+        x12_description="Implementation 'Not Used' Segment Present",
     ),
     SEG_3_TOO_MANY_ELEMENTS: ErrorCodeSpec(
         code=SEG_3_TOO_MANY_ELEMENTS,
@@ -276,6 +350,7 @@ ERROR_CODES: dict[str, ErrorCodeSpec] = {
         description="Segment has too many elements",
         ak_code="3",
         ik_code="3",
+        x12_description="Required Segment Missing",
     ),
     SEG_3_TOO_MANY_SUBELEMENTS: ErrorCodeSpec(
         code=SEG_3_TOO_MANY_SUBELEMENTS,
@@ -283,6 +358,7 @@ ERROR_CODES: dict[str, ErrorCodeSpec] = {
         description="Segment has too many sub-elements in a composite",
         ak_code="3",
         ik_code="3",
+        x12_description="Required Segment Missing",
     ),
     SEG_3_MANDATORY_SEGMENT_MISSING: ErrorCodeSpec(
         code=SEG_3_MANDATORY_SEGMENT_MISSING,
@@ -290,6 +366,7 @@ ERROR_CODES: dict[str, ErrorCodeSpec] = {
         description="Mandatory segment missing",
         ak_code="3",
         ik_code="3",
+        x12_description="Required Segment Missing",
     ),
     SEG_3_MANDATORY_LOOP_MISSING: ErrorCodeSpec(
         code=SEG_3_MANDATORY_LOOP_MISSING,
@@ -297,6 +374,7 @@ ERROR_CODES: dict[str, ErrorCodeSpec] = {
         description="Mandatory loop missing",
         ak_code="3",
         ik_code="3",
+        x12_description="Required Segment Missing",
     ),
     SEG_4_LOOP_REPEAT_EXCEEDED: ErrorCodeSpec(
         code=SEG_4_LOOP_REPEAT_EXCEEDED,
@@ -304,6 +382,7 @@ ERROR_CODES: dict[str, ErrorCodeSpec] = {
         description="Loop repeat count exceeded (loop occurs over maximum times)",
         ak_code="4",
         ik_code="4",
+        x12_description="Loop Occurs Over Maximum Times",
     ),
     SEG_5_SEGMENT_REPEAT_EXCEEDED: ErrorCodeSpec(
         code=SEG_5_SEGMENT_REPEAT_EXCEEDED,
@@ -311,6 +390,7 @@ ERROR_CODES: dict[str, ErrorCodeSpec] = {
         description="Segment repeat count exceeded (segment exceeds maximum use)",
         ak_code="5",
         ik_code="5",
+        x12_description="Segment Exceeds Maximum Use",
     ),
     SEG_8_HAS_DATA_ELEMENT_ERRORS: ErrorCodeSpec(
         code=SEG_8_HAS_DATA_ELEMENT_ERRORS,
@@ -324,6 +404,7 @@ ERROR_CODES: dict[str, ErrorCodeSpec] = {
         ),
         ak_code="8",
         ik_code="8",
+        x12_description="Segment Has Data Element Errors",
     ),
     SEG_8_SEGMENT_EMPTY: ErrorCodeSpec(
         code=SEG_8_SEGMENT_EMPTY,
@@ -331,6 +412,7 @@ ERROR_CODES: dict[str, ErrorCodeSpec] = {
         description="Segment is empty (parser-time)",
         ak_code="8",
         ik_code="8",
+        x12_description="Segment Has Data Element Errors",
     ),
     SEG_8_TRAILING_TERMINATORS: ErrorCodeSpec(
         code=SEG_8_TRAILING_TERMINATORS,
@@ -338,6 +420,7 @@ ERROR_CODES: dict[str, ErrorCodeSpec] = {
         description="Segment has trailing element terminators (was 'SEG1')",
         ak_code="8",
         ik_code="8",
+        x12_description="Segment Has Data Element Errors",
     ),
     SEG_8_HL_COUNT_MISMATCH: ErrorCodeSpec(
         code=SEG_8_HL_COUNT_MISMATCH,
@@ -345,6 +428,7 @@ ERROR_CODES: dict[str, ErrorCodeSpec] = {
         description="HL count does not match self-reported HL01 (was 'HL1')",
         ak_code=None,
         ik_code=None,
+        x12_description="Segment Has Data Element Errors",
     ),
     SEG_8_HL_INVALID_PARENT: ErrorCodeSpec(
         code=SEG_8_HL_INVALID_PARENT,
@@ -352,6 +436,7 @@ ERROR_CODES: dict[str, ErrorCodeSpec] = {
         description="HL parent reference is not on the HL stack (was 'HL2')",
         ak_code=None,
         ik_code=None,
+        x12_description="Segment Has Data Element Errors",
     ),
     SEG_8_LX_COUNT_MISMATCH: ErrorCodeSpec(
         code=SEG_8_LX_COUNT_MISMATCH,
@@ -359,6 +444,7 @@ ERROR_CODES: dict[str, ErrorCodeSpec] = {
         description="2400/LX01 service line number does not match running count (was 'LX')",
         ak_code=None,
         ik_code=None,
+        x12_description="Segment Has Data Element Errors",
     ),
     SEG_10_SYNTAX_EXCLUSIVE: ErrorCodeSpec(
         code=SEG_10_SYNTAX_EXCLUSIVE,
@@ -366,6 +452,7 @@ ERROR_CODES: dict[str, ErrorCodeSpec] = {
         description="Segment syntax rule (exclusive) violated",
         ak_code="10",
         ik_code="10",
+        x12_description="Exclusion Condition Violated",
     ),
 }
 

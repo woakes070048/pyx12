@@ -89,7 +89,7 @@ pyx12 code                          AK4   IK4   Meaning
 ``ELE_8_invalid_date_range``        8     8     Invalid date in multi-type validation
 ``ELE_9_invalid_time``              9     9     Invalid time (declared TM type)
 ``ELE_9_invalid_time_of_day``       9     9     Invalid time-of-day in multi-type validation
-``ELE_10_not_used``                 10    10    Data element marked Not Used (usage='N') but populated
+``ELE_I10_NOT_USED``                 10    10    Data element marked Not Used (usage='N') but populated
 ==================================  ====  ====  ============================================================
 
 Composite-level pyx12 codes

@@ -79,8 +79,8 @@ class TestEleError(unittest.TestCase):
         self.assertEqual(e.err_str, "element error")
 
     def test_valid_code_10(self):
-        e = EleError("ELE_10_not_used", "element error")
-        self.assertEqual(e.err_cde, "ELE_10_not_used")
+        e = EleError("ELE_I10_NOT_USED", "element error")
+        self.assertEqual(e.err_cde, "ELE_I10_NOT_USED")
 
     def test_refdes_default_none(self):
         e = EleError("ELE_1_mandatory_missing", "element error")

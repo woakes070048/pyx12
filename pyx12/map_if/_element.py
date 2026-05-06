@@ -35,7 +35,7 @@ from ..error_codes import (
     ELE_8_INVALID_DATE_RANGE,
     ELE_9_INVALID_TIME,
     ELE_9_INVALID_TIME_OF_DAY,
-    ELE_10_NOT_USED,
+    ELE_I10_NOT_USED,
 )
 from ..error_item import EleError
 from ..errors import EngineError
@@ -192,7 +192,7 @@ class element_if(x12_node):
             return (not empty_errors, empty_errors)
         if self.usage == "N" and elem.get_value() != "":
             err_str = 'Data element "%s" (%s) is marked as Not Used' % (self.name, self.refdes)
-            errors.append(self._ele_error(ELE_10_NOT_USED, err_str, None))
+            errors.append(self._ele_error(ELE_I10_NOT_USED, err_str, None))
             return False, errors
 
         elem_val = elem.get_value()

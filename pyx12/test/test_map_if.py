@@ -464,7 +464,7 @@ class ElementRequirement(unittest.TestCase):
         seg_data = pyx12.segment.Segment("REF*87*004010X098A1*Description*~", "~", "*", ":")
         result, errors = node.is_valid_errors(seg_data)
         self.assertFalse(result)
-        self.assertEqual([e.err_cde for e in errors], ["ELE_10_not_used"])
+        self.assertEqual([e.err_cde for e in errors], ["ELE_I10_NOT_USED"])
 
     def test_ele_required_ok1(self):
         node = self.map.getnodebypath("/ISA_LOOP/GS_LOOP/ST_LOOP/DETAIL/2000A/2000B/2300/CLM")

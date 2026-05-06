@@ -89,6 +89,7 @@ class X12CodeForResolution(unittest.TestCase):
             description="synthetic",
             ak_code="1",
             ik_code=None,
+            x12_description="Synthetic test code",
         )
         # Patch ERROR_CODES temporarily.
         try:
