@@ -81,7 +81,7 @@ ELE_9_INVALID_TIME_OF_DAY = "ELE_9_invalid_time_of_day"
 ELE_10_SYNTAX_EXCLUSIVE = "ELE_10_syntax_exclusive"
 ELE_12_TOO_MANY_REPETITIONS = "ELE_12_too_many_repetitions"
 ELE_13_TOO_MANY_COMPONENTS = "ELE_13_too_many_components"
-ELE_I10_NOT_USED = "ELE_I10_not_used"
+ELE_I10_NOT_USED = "ELE_I10_NOT_USED"
 
 # Composite-level pyx12 codes. Composites historically emitted via
 # EleError carrying the seg_error code semantics (see _composite.py).
